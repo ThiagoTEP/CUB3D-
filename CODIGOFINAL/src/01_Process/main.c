@@ -69,6 +69,7 @@ void	render(t_mlx *win)
 	mlx_hook(win->mlx_win, MotionNotify, PointerMotionMask, ft_mouse_move, win);
 	mlx_hook(win->mlx_win, KeyRelease, KeyReleaseMask, key_release, win);
 	mlx_hook(win->mlx_win, 17, 0, ft_close, win);
+	mlx_mouse_hide(win->mlx_connect, win->mlx_win);
 	mlx_loop(win->mlx_connect);
 }
 

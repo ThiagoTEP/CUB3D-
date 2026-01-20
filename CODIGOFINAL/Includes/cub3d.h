@@ -34,6 +34,8 @@
 
 # define WIDTH 1920
 # define HEIGHT 1080
+# define H_WIDTH 960
+# define H_HEIGHT 540
 
 # define SQUARE 64
 # define PLAYER_SIZE 20
@@ -175,8 +177,6 @@ typedef struct s_mlx
 	int			color_top;
 	int			color_bot;
 	int			texture_nbr;
-	int			mouse_x;
-	int			mouse_last_x;
 	int			mouse_init;
 	t_keys		keys;
 }	t_mlx;

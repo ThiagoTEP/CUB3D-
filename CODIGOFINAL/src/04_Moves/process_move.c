@@ -88,15 +88,17 @@ int	ft_mouse_move(int x, int y, t_mlx *mlx)
 
 	(void)y;
 	sensitivity = 0.0025f;
+	if (x == H_WIDTH)
+		return (0);
 	if (!mlx->mouse_init)
 	{
-		mlx->mouse_last_x = x;
+		mlx_mouse_move(mlx->mlx_connect, mlx->mlx_win, H_WIDTH, H_HEIGHT);
 		mlx->mouse_init = 1;
 		return (0);
 	}
-	delta_x = x - mlx->mouse_last_x;
-	mlx->mouse_last_x = x;
+	delta_x = x - H_WIDTH;
 	rotate_player_by(mlx, delta_x * sensitivity);
+	mlx_mouse_move(mlx->mlx_connect, mlx->mlx_win, H_WIDTH, H_HEIGHT);
 	return (0);
 }
 
