@@ -62,22 +62,42 @@ static int	check_collision(t_mlx *mlx, float x, float y)
 	return (mlx->map->coord[my][mx] == '1');
 }
 
+static void	rotate_player_by(t_mlx *mlx, float delta)
+{
+	mlx->player->player_angle += delta;
+	if (mlx->player->player_angle < 0)
+		mlx->player->player_angle += 2 * PI;
+	if (mlx->player->player_angle > 2 * PI)
+		mlx->player->player_angle -= 2 * PI;
+	mlx->player->player_delta_x = cos(mlx->player->player_angle) * 7;
+	mlx->player->player_delta_y = sin(mlx->player->player_angle) * 7;
+}
+
 static void	rotate_player(t_mlx *mlx, float rot_speed)
 {
 	if (mlx->keys.left)
-	{
-		mlx->player->player_angle -= rot_speed;
-		if (mlx->player->player_angle < 0)
-			mlx->player->player_angle += 2 * PI;
-	}
+		rotate_player_by(mlx, -rot_speed);
 	if (mlx->keys.right)
+		rotate_player_by(mlx, rot_speed);
+}
+
+int	ft_mouse_move(int x, int y, t_mlx *mlx)
+{
+	int		delta_x;
+	float	sensitivity;
+
+	(void)y;
+	sensitivity = 0.0025f;
+	if (!mlx->mouse_init)
 	{
-		mlx->player->player_angle += rot_speed;
-		if (mlx->player->player_angle > 2 * PI)
-			mlx->player->player_angle -= 2 * PI;
+		mlx->mouse_last_x = x;
+		mlx->mouse_init = 1;
+		return (0);
 	}
-	mlx->player->player_delta_x = cos(mlx->player->player_angle) * 7;
-	mlx->player->player_delta_y = sin(mlx->player->player_angle) * 7;
+	delta_x = x - mlx->mouse_last_x;
+	mlx->mouse_last_x = x;
+	rotate_player_by(mlx, delta_x * sensitivity);
+	return (0);
 }
 
 static void	move_forward_back(t_mlx *mlx, float *x, float *y, float speed)

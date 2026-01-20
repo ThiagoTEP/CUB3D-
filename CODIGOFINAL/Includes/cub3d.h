@@ -175,6 +175,9 @@ typedef struct s_mlx
 	int			color_top;
 	int			color_bot;
 	int			texture_nbr;
+	int			mouse_x;
+	int			mouse_last_x;
+	int			mouse_init;
 	t_keys		keys;
 }	t_mlx;
 
@@ -231,6 +234,7 @@ int		get_pixel_color(t_tex *img, int x, int y);
 void	ft_vision_angle(t_mlx *win, float px, float py);
 void	ft_texture_picker(t_mlx *win, float ray_point, char c);
 void	draw_3d_walls(t_mlx *win, float distance, int column, float hx);
+int		ft_mouse_move(int x, int y, t_mlx *mlx);
 
 // --------------- 04_MOVES ------------------ //
 

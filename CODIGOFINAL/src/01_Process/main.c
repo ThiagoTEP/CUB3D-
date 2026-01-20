@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include "../../Includes/cub3d.h"
+#include <X11/X.h>
 
 int	draw(t_mlx *win)
 {
@@ -53,6 +54,7 @@ void	render(t_mlx *win)
 	win->keys.left = 0;
 	win->keys.right = 0;
 	win->keys.esc = 0;
+	win->mouse_init = 0;
 	win->mlx_connect = mlx_init();
 	win->mlx_win = mlx_new_window(win->mlx_connect, WIDTH, HEIGHT, "Cub3D");
 	win->img.mlx_img = mlx_new_image(win->mlx_connect, WIDTH, HEIGHT);
@@ -62,8 +64,9 @@ void	render(t_mlx *win)
 	start_textures(win, &win->south_texture);
 	start_textures(win, &win->east_texture);
 	start_textures(win, &win->west_texture);
-	mlx_loop_hook(win->mlx_connect, &draw, win);
 	mlx_hook(win->mlx_win, KeyPress, KeyPressMask, key_press, win);
+	mlx_loop_hook(win->mlx_connect, &draw, win);
+	mlx_hook(win->mlx_win, MotionNotify, PointerMotionMask, ft_mouse_move, win);
 	mlx_hook(win->mlx_win, KeyRelease, KeyReleaseMask, key_release, win);
 	mlx_hook(win->mlx_win, 17, 0, ft_close, win);
 	mlx_loop(win->mlx_connect);
