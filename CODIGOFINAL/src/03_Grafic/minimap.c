@@ -19,6 +19,46 @@ static void draw_mm_tile(t_img *img, int sx, int sy, int color)
     }
 }
 
+static void draw_mm_dir_ray(t_mlx *win, float ra)
+{
+    int     i;
+    float   x;
+    float   y;
+    float   dx;
+    float   dy;
+
+    i = 0;
+    x = (MM_MARGIN + (win->player->x / SQUARE) * MM_TILE) + MM_P_MARGIN;
+    y = (MM_MARGIN + (win->player->y / SQUARE) * MM_TILE) + MM_P_MARGIN;
+    dx = cos(ra);
+    dy = sin(ra);
+    while (i < 50)
+    {
+        my_pixel_put(&win->img, (int)x, (int)y, 0xFF0000);
+        x += dx;
+        y += dy;
+        i++;
+    }
+}
+
+static void draw_mm_dir(t_mlx *win)
+{
+    int     i;
+    float   start;
+    float   step;
+    float   ra;
+
+    start = win->player->player_angle - (FOV / 2);
+    step = FOV / 30;
+    i = 0;
+    while (i < 30)
+    {
+        ra = start + i * step;
+        draw_mm_dir_ray(win, ra);
+        i++;
+    }
+}
+
 static void draw_mm_player(t_mlx *win)
 {
     int py;
@@ -53,4 +93,5 @@ void    ft_draw_minimap(t_mlx *win)
         y++;
     }
     draw_mm_player(win);
+    draw_mm_dir(win);
 }

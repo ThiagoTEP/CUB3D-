@@ -41,6 +41,7 @@
 # define PLAYER_SIZE 20
 # define MM_TILE 8
 # define MM_MARGIN 20
+# define MM_P_MARGIN 4
 
 # define DR 0.000545415 //(FOV / WIDTH)
 
