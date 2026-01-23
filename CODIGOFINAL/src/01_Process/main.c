@@ -21,6 +21,7 @@ int	draw(t_mlx *win)
 	ft_vision_angle(win, win->player->x, win->player->y);
 	render_background_top_bot(win, &win->img);
 	raycaster(win);
+    ft_draw_minimap(win);
 	mlx_put_image_to_window(win->mlx_connect, win->mlx_win,
 		win->img.mlx_img, 0, 0);
 	return (0);

@@ -39,6 +39,8 @@
 
 # define SQUARE 64
 # define PLAYER_SIZE 20
+# define MM_TILE 8
+# define MM_MARGIN 20
 
 # define DR 0.000545415 //(FOV / WIDTH)
 
@@ -235,6 +237,7 @@ void	ft_vision_angle(t_mlx *win, float px, float py);
 void	ft_texture_picker(t_mlx *win, float ray_point, char c);
 void	draw_3d_walls(t_mlx *win, float distance, int column, float hx);
 int		ft_mouse_move(int x, int y, t_mlx *mlx);
+void    ft_draw_minimap(t_mlx *win);
 
 // --------------- 04_MOVES ------------------ //
 

@@ -20,7 +20,7 @@ PARSE = $(addprefix 02_Parse/, $(PARSE_FILES))
 
 # --- 03 Grafic ---
 GRAFIC_FILES =	draw_shapes.c get_map.c render.c vision_line.c \
-				raycast.c wall_and_textures.c
+				raycast.c wall_and_textures.c minimap.c
 GRAFIC = $(addprefix 03_Grafic/, $(GRAFIC_FILES))
 
 # --- 04 Moves ---
