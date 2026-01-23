@@ -19,22 +19,38 @@ static void draw_mm_tile(t_img *img, int sx, int sy, int color)
     }
 }
 
+static int mm_hit_check(t_mlx *win, float x, float y)
+{
+    int map_x;
+    int map_y;
+
+    map_x = (int)((x - MM_MARGIN) / MM_TILE); 
+    map_y = (int)((y - MM_MARGIN) / MM_TILE);
+    if (map_x < 0 || map_x >= win->map->width || map_y < 0 || map_y >= win->map->height)
+        return (1);
+    return (win->map->coord[map_y][map_x] == '1');
+}
+
 static void draw_mm_dir_ray(t_mlx *win, float ra)
 {
     int     i;
+    int     mm_lim;
     float   x;
     float   y;
     float   dx;
     float   dy;
 
     i = 0;
+    mm_lim = win->map->width * SQUARE;
     x = (MM_MARGIN + (win->player->x / SQUARE) * MM_TILE) + MM_P_MARGIN;
     y = (MM_MARGIN + (win->player->y / SQUARE) * MM_TILE) + MM_P_MARGIN;
     dx = cos(ra);
     dy = sin(ra);
-    while (i < 50)
+    while (i < mm_lim)
     {
-        my_pixel_put(&win->img, (int)x, (int)y, 0xFF0000);
+        if (mm_hit_check(win, x, y))
+                break;
+        my_pixel_put(&win->img, (int)x, (int)y, 0xAA00FF);
         x += dx;
         y += dy;
         i++;
