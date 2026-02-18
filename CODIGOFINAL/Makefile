@@ -70,7 +70,7 @@ $(NAME): $(OBJ)
 	@echo "$(GREEN)✅ Executable $(NAME) Successfully created$(RESET)"
 	@echo "$(PURPLE)"
 	@echo "          ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░"
-	@echo "        ░░░       Thevaris &                       ░░░"
+	@echo "        ░░░       Thevaris & Thenriqu              ░░░"
 	@echo "      ░░     ┌────────────────────────────────────┐  ░░"
 	@echo "     ░░     /│                                   /│   ░░"
 	@echo "    ░░     / │                                  / │    ░░"
