@@ -87,7 +87,7 @@ int	ft_mouse_move(int x, int y, t_mlx *mlx)
 	float	sensitivity;
 
 	(void)y;
-	sensitivity = 0.0025f;
+	sensitivity = 0.00025f;
 	if (x == H_WIDTH)
 		return (0);
 	if (!mlx->mouse_init)
