@@ -1,16 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   process_move.c                                     :+:      :+:    :+:   */
+/*   process_move_bonus.c                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: thevaris <thevaris@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/01/04 20:15:41 by thevaris          #+#    #+#             */
-/*   Updated: 2026/02/19 15:33:18 by thevaris         ###   ########.fr       */
+/*   Created: 2026/02/20 16:36:12 by thevaris          #+#    #+#             */
+/*   Updated: 2026/02/20 17:39:56 by thevaris         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../Includes/cub3d.h"
+#include "../cub3D_bonus.h"
 
 static void	set_key(int keycode, t_keys *keys, int value)
 {
@@ -28,10 +28,14 @@ static void	set_key(int keycode, t_keys *keys, int value)
 		keys->right = value;
 	else if (keycode == XK_Escape)
 		keys->esc = value;
+	else if (keycode == XK_e)
+		keys->e = value;
 }
 
 int	key_press(int keycode, t_mlx *mlx)
 {
+	if (keycode == XK_e)
+		toggle_nearby_door(mlx);
 	set_key(keycode, &mlx->keys, 1);
 	return (0);
 }
@@ -42,24 +46,43 @@ int	key_release(int keycode, t_mlx *mlx)
 	return (0);
 }
 
+static int	tile_is_solid(t_mlx *mlx, int mx, int my)
+{
+	char	c;
+	t_door	*door;
+
+	if (mx < 0 || mx >= mlx->map->width || my < 0 || my >= mlx->map->height)
+		return (1);
+	c = mlx->map->coord[my][mx];
+	if (c == '1')
+		return (1);
+	if (c == DOOR_CHAR)
+	{
+		door = get_door_at(mlx, mx, my);
+		if (!door || door->state == DOOR_CLOSED || door->state == DOOR_CLOSING)
+			return (1);
+	}
+	return (0);
+}
+
 static int	check_collision(t_mlx *mlx, float x, float y)
 {
-	int		mx;
-	int		my;
 	float	margin;
 
 	margin = 10.0f;
-	mx = (int)((x - margin) / SQUARE);
-	my = (int)((y - margin) / SQUARE);
-	if (mx < 0 || mx >= mlx->map->width || my < 0 || my >= mlx->map->height)
+	if (tile_is_solid(mlx, (int)((x - margin) / SQUARE),
+		(int)((y - margin) / SQUARE)))
 		return (1);
-	if (mlx->map->coord[my][mx] == '1')
+	if (tile_is_solid(mlx, (int)((x + margin) / SQUARE),
+		(int)((y - margin) / SQUARE)))
 		return (1);
-	mx = (int)((x + margin) / SQUARE);
-	my = (int)((y + margin) / SQUARE);
-	if (mx < 0 || mx >= mlx->map->width || my < 0 || my >= mlx->map->height)
+	if (tile_is_solid(mlx, (int)((x - margin) / SQUARE),
+		(int)((y + margin) / SQUARE)))
 		return (1);
-	return (mlx->map->coord[my][mx] == '1');
+	if (tile_is_solid(mlx, (int)((x + margin) / SQUARE),
+		(int)((y + margin) / SQUARE)))
+		return (1);
+	return (0);
 }
 
 static void	rotate_player_by(t_mlx *mlx, float delta)
@@ -71,6 +94,27 @@ static void	rotate_player_by(t_mlx *mlx, float delta)
 		mlx->player->player_angle -= 2 * PI;
 	mlx->player->player_delta_x = cos(mlx->player->player_angle) * 7;
 	mlx->player->player_delta_y = sin(mlx->player->player_angle) * 7;
+}
+
+int	ft_mouse_move(int x, int y, t_mlx *mlx)
+{
+	int		delta_x;
+	float	sensitivity;
+
+	(void)y;
+	sensitivity = 0.0025f;
+	if (x == H_WIDTH)
+		return (0);
+	if (!mlx->mouse_init)
+	{
+		mlx_mouse_move(mlx->mlx_connect, mlx->mlx_win, H_WIDTH, H_HEIGHT);
+		mlx->mouse_init = 1;
+		return (0);
+	}
+	delta_x = x - H_WIDTH;
+	rotate_player_by(mlx, delta_x * sensitivity);
+	mlx_mouse_move(mlx->mlx_connect, mlx->mlx_win, H_WIDTH, H_HEIGHT);
+	return (0);
 }
 
 static void	rotate_player(t_mlx *mlx, float rot_speed)
@@ -133,9 +177,11 @@ void	process_movement(t_mlx *mlx)
 	move_strafe(mlx, &new_x, &new_y, 5.0f);
 	temp_x = mlx->player->x;
 	temp_y = mlx->player->y;
-	if (!check_collision(mlx, new_x, temp_y))
+	if (!check_collision(mlx, new_x, temp_y)
+		|| check_collision(mlx, temp_x, temp_y))
 		mlx->player->x = new_x;
-	if (!check_collision(mlx, temp_x, new_y))
+	if (!check_collision(mlx, temp_x, new_y)
+		|| check_collision(mlx, temp_x, temp_y))
 		mlx->player->y = new_y;
 	if (mlx->keys.esc)
 		ft_cleanup_and_exit(mlx);

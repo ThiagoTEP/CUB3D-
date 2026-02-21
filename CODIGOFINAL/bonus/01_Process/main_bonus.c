@@ -1,32 +1,51 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
+/*   main_bonus.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: thevaris <thevaris@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/01/04 20:14:11 by thevaris          #+#    #+#             */
-/*   Updated: 2026/02/19 15:32:47 by thevaris         ###   ########.fr       */
+/*   Created: 2026/02/20 16:33:12 by thevaris          #+#    #+#             */
+/*   Updated: 2026/02/20 17:41:54 by thevaris         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../Includes/cub3d.h"
+#include "../cub3D_bonus.h"
 #include <X11/X.h>
+#include <sys/time.h>
+
+static double	get_time_ms(void)
+{
+	struct timeval	tv;
+
+	gettimeofday(&tv, NULL);
+	return (tv.tv_sec * 1000.0 + tv.tv_usec / 1000.0);
+}
 
 int	draw(t_mlx *win)
 {
+	static double	last_time;
+	double			now;
+
+	now = get_time_ms();
+	if (last_time == 0)
+		last_time = now;
+	win->delta_time = (now - last_time) / 1000.0;
+	last_time = now;
 	process_movement(win);
+	update_all_doors(win, win->delta_time);
 	render_background(&win->img, 0xD3D3D3);
 	ft_update_player(win->player->x, win->player->y, &win->img, win);
 	ft_vision_angle(win, win->player->x, win->player->y);
 	render_background_top_bot(win, &win->img);
 	raycaster(win);
+	ft_draw_minimap(win);
 	mlx_put_image_to_window(win->mlx_connect, win->mlx_win,
 		win->img.mlx_img, 0, 0);
 	return (0);
 }
 
-void	start_textures(t_mlx *win, t_tex *texture)
+static void	start_textures(t_mlx *win, t_tex *texture)
 {
 	if (texture->path == NULL)
 	{
@@ -45,6 +64,26 @@ void	start_textures(t_mlx *win, t_tex *texture)
 			&texture->endian);
 }
 
+static void	start_door_texture(t_mlx *win)
+{
+	char	*path;
+
+	path = ft_strdup("./Textures/door_closed.xpm");
+	if (!path)
+		return ;
+	win->door_tex.mlx_img = mlx_xpm_file_to_image(win->mlx_connect,
+			path, &win->door_tex.width, &win->door_tex.height);
+	free(path);
+	if (!win->door_tex.mlx_img)
+	{
+		print_error("Warning: door_closed.xpm not found, using west texture\n");
+		return ;
+	}
+	win->door_tex.addr = mlx_get_data_addr(win->door_tex.mlx_img,
+			&win->door_tex.bpp, &win->door_tex.line_len,
+			&win->door_tex.endian);
+}
+
 void	render(t_mlx *win)
 {
 	win->keys.w = 0;
@@ -54,6 +93,9 @@ void	render(t_mlx *win)
 	win->keys.left = 0;
 	win->keys.right = 0;
 	win->keys.esc = 0;
+	win->keys.e = 0;
+	win->mouse_init = 0;
+	win->delta_time = 0;
 	win->mlx_connect = mlx_init();
 	win->mlx_win = mlx_new_window(win->mlx_connect, WIDTH, HEIGHT, "Cub3D");
 	win->img.mlx_img = mlx_new_image(win->mlx_connect, WIDTH, HEIGHT);
@@ -63,10 +105,13 @@ void	render(t_mlx *win)
 	start_textures(win, &win->south_texture);
 	start_textures(win, &win->east_texture);
 	start_textures(win, &win->west_texture);
+	start_door_texture(win);
 	mlx_hook(win->mlx_win, KeyPress, KeyPressMask, key_press, win);
-	mlx_loop_hook(win->mlx_connect, &draw, win);
 	mlx_hook(win->mlx_win, KeyRelease, KeyReleaseMask, key_release, win);
+	mlx_hook(win->mlx_win, MotionNotify, PointerMotionMask, ft_mouse_move, win);
 	mlx_hook(win->mlx_win, 17, 0, ft_close, win);
+	mlx_loop_hook(win->mlx_connect, &draw, win);
+	mlx_mouse_hide(win->mlx_connect, win->mlx_win);
 	mlx_loop(win->mlx_connect);
 }
 
@@ -119,6 +164,6 @@ int	main(int argc, char *argv[])
 	else if (argc > 1)
 		print_error("Error\nOnly one input is accepted\n");
 	else
-		print_error("Error\nPlease use: ./cub3d map_file/valid/map\n");
+		print_error("Error\nPlease use: ./cub3d_bonus map_file/valid/map\n");
 	return (0);
 }

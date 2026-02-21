@@ -1,11 +1,14 @@
-
-NAME = cub3D
+NAME        = cub3D
+NAME_BONUS  = cub3D_bonus
 
 ##################################
 
 SRC_DIR	= src/
 OBJ_DIR	= .obj/
-INC_DIR	= includes/
+BONUS_DIR   = bonus/
+BONUS_OBJ   = .obj_bonus/
+INC_DIR	= Includes/
+BONUS_INC   = bonus/
 
 # --- 01 Process ---
 PROCESS_FILES =	clean_process.c msg_error.c free_process.c getters.c \
@@ -20,7 +23,7 @@ PARSE = $(addprefix 02_Parse/, $(PARSE_FILES))
 
 # --- 03 Grafic ---
 GRAFIC_FILES =	draw_shapes.c get_map.c render.c vision_line.c \
-				raycast.c wall_and_textures.c minimap.c
+				raycast.c wall_and_textures.c
 GRAFIC = $(addprefix 03_Grafic/, $(GRAFIC_FILES))
 
 # --- 04 Moves ---
@@ -31,6 +34,64 @@ MOVES = $(addprefix 04_Moves/, $(MOVES_FILES))
 SRC_FILES = $(PROCESS) $(PARSE) $(GRAFIC) $(MOVES)
 SRC = $(addprefix $(SRC_DIR), $(SRC_FILES))
 OBJ = $(patsubst $(SRC_DIR)%.c, $(OBJ_DIR)%.o, $(SRC))
+
+# ------- BONUS SOURCE FILES -------
+
+# 01_Process bonus
+# main_bonus.c         -> replaces main.c + clean_process.c(ft_remove_extra_spaces)
+# setters_bonus.c      -> replaces setters.c (adds init_doors)
+# clean_process_bonus.c-> replaces clean_process.c + free_process.c
+BONUS_PROCESS_FILES = main_bonus.c setters_bonus.c clean_process_bonus.c
+BONUS_PROCESS = $(addprefix 01_Process/, $(BONUS_PROCESS_FILES))
+
+# 01_Process shared: only msg_error.c and getters.c have no conflicts
+BONUS_SHARED_PROCESS_FILES = msg_error.c getters.c free_process.c
+BONUS_SHARED_PROCESS = $(addprefix 01_Process/, $(BONUS_SHARED_PROCESS_FILES))
+
+# 02_Parse bonus
+# parse_map_bonus.c -> replaces parse_checkers.c
+#                      defines first_check + check_line_player (accepts 'D')
+BONUS_PARSE_FILES = parse_map_bonus.c flood_map_bonus.c
+BONUS_PARSE = $(addprefix 02_Parse/, $(BONUS_PARSE_FILES))
+
+# 02_Parse shared: parse_checkers.c excluded (conflict with parse_map_bonus.c)
+BONUS_SHARED_PARSE_FILES = parse_assets.c parse_validations.c \
+                            parse_input.c parse_color.c parse_extensions.c
+BONUS_SHARED_PARSE = $(addprefix 02_Parse/, $(BONUS_SHARED_PARSE_FILES))
+
+# 03_Grafic bonus
+# minimap_bonus.c -> replaces minimap.c
+# raycast_bonus.c -> replaces raycast.c (with door support)
+# door_bonus.c    -> new (door logic)
+BONUS_GRAFIC_FILES = minimap_bonus.c raycast_bonus.c door_bonus.c
+BONUS_GRAFIC = $(addprefix 03_Grafic/, $(BONUS_GRAFIC_FILES))
+
+# 03_Grafic shared: raycast.c and minimap.c excluded (conflict)
+BONUS_SHARED_GRAFIC_FILES = draw_shapes.c get_map.c render.c vision_line.c \
+                             wall_and_textures.c
+BONUS_SHARED_GRAFIC = $(addprefix 03_Grafic/, $(BONUS_SHARED_GRAFIC_FILES))
+
+# 04_Moves bonus
+# process_move_bonus.c -> replaces process_move.c (adds mouse + E key)
+BONUS_MOVES_FILES = process_move_bonus.c
+BONUS_MOVES = $(addprefix 04_Moves/, $(BONUS_MOVES_FILES))
+
+# 04_Moves shared: process_move.c excluded (conflict)
+BONUS_SHARED_MOVES_FILES = utils.c move_render.c
+BONUS_SHARED_MOVES = $(addprefix 04_Moves/, $(BONUS_SHARED_MOVES_FILES))
+
+# --- All bonus objects ---
+BONUS_FROM_BONUS = $(BONUS_PROCESS) $(BONUS_PARSE) $(BONUS_GRAFIC) $(BONUS_MOVES)
+BONUS_FROM_SRC   = $(BONUS_SHARED_PROCESS) $(BONUS_SHARED_PARSE) \
+                   $(BONUS_SHARED_GRAFIC) $(BONUS_SHARED_MOVES)
+
+BONUS_SRC_A = $(addprefix $(BONUS_DIR), $(BONUS_FROM_BONUS))
+BONUS_SRC_B = $(addprefix $(SRC_DIR), $(BONUS_FROM_SRC))
+
+BONUS_OBJ_A = $(patsubst $(BONUS_DIR)%.c, $(BONUS_OBJ)bonus/%.o, $(BONUS_SRC_A))
+BONUS_OBJ_B = $(patsubst $(SRC_DIR)%.c, $(BONUS_OBJ)src/%.o, $(BONUS_SRC_B))
+
+ALL_BONUS_OBJ = $(BONUS_OBJ_A) $(BONUS_OBJ_B)
 
 # --- Compiler and flags ---
 CC = cc -g
@@ -46,6 +107,7 @@ GREEN = \033[38;5;47m
 YELLOW = \033[38;5;226m
 RED = \033[38;5;196m
 PURPLE = \033[38;5;129m
+CYAN = \033[38;5;51m
 RESET = \033[0m
 
 # --- Silent modes ---
@@ -97,21 +159,70 @@ $(OBJ_DIR)%.o: $(SRC_DIR)%.c
 	@echo "$(YELLOW)🔨 Compiling $(notdir $<)...$(RESET)"
 	$(SILENT_COMPILE)
 
+# ------ BONUS ------
+
+bonus: $(LIBFT) $(LIBX) $(NAME_BONUS)
+
+$(NAME_BONUS): $(ALL_BONUS_OBJ)
+	@echo "$(CYAN)🔗 Linking $(NAME_BONUS)...$(RESET)"
+	@$(CC) $(CFLAGS) $(ALL_BONUS_OBJ) $(LIBFT) $(LIBX) $(MINILXFLAGS) \
+	 -o $(NAME_BONUS) 2>/dev/null || \
+	 (echo "$(RED)❌ Linker error (bonus)$(RESET)" && exit 1)
+	@echo "$(GREEN)✅ $(NAME_BONUS) created (minimap + mouse + doors [E key])$(RESET)"
+	@echo "$(PURPLE)"
+	@echo "          ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░"
+	@echo "        ░░░       Thevaris & Thenriqu              ░░░"
+	@echo "      ░░     ┌────────────────────────────────────┐  ░░"
+	@echo "     ░░     /│                                   /│   ░░"
+	@echo "    ░░     / │                                  / │    ░░"
+	@echo "   ░░     /  │                                 /  │     ░░"
+	@echo "  ░░     /   │                                /   │      ░░"
+	@echo " ░░     /    │                               /    │       ░░"
+	@echo "░░     ┌─────┼──────────────────────────────┐     │        ░░"
+	@echo "░      │     │                              │     │         ░"
+	@echo "░      │     │        CUB3D BONUS           │     │         ░"
+	@echo "░░     │     │         3D ENGINE            │     │        ░░"
+	@echo " ░░    │     └──────────────────────────────┼─────┘       ░░"
+	@echo "  ░░   │    /                               │    /       ░░"
+	@echo "   ░░  │   /                                │   /       ░░"
+	@echo "    ░░ │  /                                 │  /       ░░"
+	@echo "     ░░│ /                                  │ /       ░░"
+	@echo "      ░│/                                   │/       ░░"
+	@echo "      ░└────────────────────────────────────┘        ░"
+	@echo "      ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░"
+	@echo "$(RESET)"
+
+# Compile bonus files from bonus/
+$(BONUS_OBJ)bonus/%.o: $(BONUS_DIR)%.c
+	@mkdir -p $(dir $@)
+	@echo "$(CYAN)🔨 [bonus] Compiling $(notdir $<)...$(RESET)"
+	@$(CC) $(CFLAGS) -I$(BONUS_INC) -c $< -o $@ 2>/dev/null || \
+	 (echo "$(RED)❌ Error compiling $<$(RESET)" && exit 1)
+
+# Compile shared files from src/ for bonus (using bonus header)
+$(BONUS_OBJ)src/%.o: $(SRC_DIR)%.c
+	@mkdir -p $(dir $@)
+	@echo "$(CYAN)🔨 [bonus/shared] Compiling $(notdir $<)...$(RESET)"
+	@$(CC) $(CFLAGS) -I$(BONUS_INC) -c $< -o $@ 2>/dev/null || \
+	 (echo "$(RED)❌ Error compiling $<$(RESET)" && exit 1)
+
 # Cleanup
 clean:
-	@rm -rf $(OBJ_DIR) 2>/dev/null || true
+	@rm -rf $(OBJ_DIR) $(BONUS_OBJ) 2>/dev/null || true
 	@echo "$(YELLOW)🗑️ Object files removed$(RESET)"
 	@cd libraries/libft && make clean > /dev/null 2>&1
 	@cd minilibx-linux && make clean > /dev/null 2>&1
 
 fclean: clean
-	@rm -rf $(NAME) 2>/dev/null || true
-	@echo "$(RED)❌ Executable $(NAME) removed$(RESET)"
+	@rm -rf $(NAME) $(NAME_BONUS) 2>/dev/null || true
+	@echo "$(RED)❌ Executable $(NAME) $(NAME_BONUS) removed$(RESET)"
 	@cd libraries/libft && make fclean > /dev/null 2>&1
 
 re: fclean all
 
-.PHONY: all clean fclean re
+re_bonus: fclean bonus
+
+.PHONY: all clean fclean re bonus re_bonus
 
 # Rules for libraries (silent mode)
 $(LIBFT):

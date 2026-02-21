@@ -1,17 +1,17 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   cub3d.h                                            :+:      :+:    :+:   */
+/*   cub3D_bonus.h                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: thevaris <thevaris@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/01/04 20:17:16 by thevaris          #+#    #+#             */
-/*   Updated: 2026/02/20 17:46:23 by thevaris         ###   ########.fr       */
+/*   Created: 2026/02/20 16:36:17 by thevaris          #+#    #+#             */
+/*   Updated: 2026/02/20 17:38:19 by thevaris         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef CUB3D_H
-# define CUB3D_H
+#ifndef CUB3D_BONUS_H
+# define CUB3D_BONUS_H
 
 # include <stdlib.h>
 # include <unistd.h>
@@ -27,10 +27,10 @@
 # include "../libraries/libft/libft.h"
 
 # define PI 3.14159265359
-# define P2 1.57079632679 // PI/2
-# define P3 4.71238898038 //3*PI/2
+# define P2 1.57079632679
+# define P3 4.71238898038
 
-# define FOV 1.04719755 //(PI / 3)
+# define FOV 1.04719755
 
 # define WIDTH 1920
 # define HEIGHT 1080
@@ -39,9 +39,16 @@
 
 # define SQUARE 64
 # define PLAYER_SIZE 20
+# define MM_TILE 8
+# define MM_MARGIN 20
 # define MM_P_MARGIN 4
 
-# define DR 0.000545415 //(FOV / WIDTH)
+# define DR 0.000545415
+
+/* Door definitions */
+# define DOOR_FRAMES    8
+# define DOOR_FPS       10.0
+# define DOOR_CHAR      'D'
 
 typedef struct s_valid_map
 {
@@ -78,7 +85,22 @@ typedef enum e_exit
 	SUCCESS,
 }	t_exit;
 
-//--------- calculations intersection -------
+typedef enum e_door_state
+{
+	DOOR_CLOSED,
+	DOOR_OPENING,
+	DOOR_OPEN,
+	DOOR_CLOSING,
+}	t_door_state;
+
+typedef struct s_door
+{
+	int				x;
+	int				y;
+	int				frame;
+	double			timer;
+	t_door_state	state;
+}	t_door;
 
 typedef struct s_ray
 {
@@ -102,9 +124,7 @@ typedef struct s_ray_vars
 	float	wall_x;
 	float	line;
 }	t_ray_vars;
-//--------- ------------ -------
 
-//--------- texture calculations -------
 typedef struct s_texture_vars
 {
 	int		y;
@@ -114,13 +134,13 @@ typedef struct s_texture_vars
 	float	ty_offset;
 }	t_texture_vars;
 
-//----------------------------
-
 typedef struct s_map
 {
-	int					width;
-	int					height;
-	char				**coord;
+	int		width;
+	int		height;
+	char	**coord;
+	t_door	*doors;
+	int		door_count;
 }	t_map;
 
 typedef struct s_img
@@ -162,6 +182,7 @@ typedef struct s_keys
 	int	left;
 	int	right;
 	int	esc;
+	int	e;
 }	t_keys;
 
 typedef struct s_mlx
@@ -175,15 +196,16 @@ typedef struct s_mlx
 	t_tex		east_texture;
 	t_tex		south_texture;
 	t_tex		west_texture;
+	t_tex		door_tex;
 	int			color_top;
 	int			color_bot;
 	int			texture_nbr;
 	int			mouse_init;
+	double		delta_time;
 	t_keys		keys;
 }	t_mlx;
 
-// --------------- 01_PROCESS ------------------ //
-
+/* ---- 01_Process ---- */
 void	ft_cleanup_and_exit(t_mlx *mlx);
 int		ft_close(t_mlx *mlx);
 void	free_map_parse(t_temp_map **map);
@@ -199,8 +221,7 @@ float	ft_set_player(t_mlx *win, char **map);
 void	set_up_win(t_mlx *win, t_temp_map *map);
 char	*ft_remove_extra_spaces(char *str, t_temp_map *map);
 
-// --------------- 02_PARSE ------------------ //
-
+/* ---- 02_Parse ---- */
 void	flood(t_temp_map *map, int y, int x, int map_size);
 int		ft_check_first_last(char **map, int i);
 int		check_the_sides(char **map, int y, int map_size);
@@ -218,8 +239,7 @@ char	*ft_color_special(char *line, int j, int i, t_temp_map *map);
 void	ft_validations(char *argv[]);
 int		is_whitespace(char c);
 
-// --------------- 03_GRAFIC ------------------ //
-
+/* ---- 03_Grafic ---- */
 void	ft_update_player(int px, int py, t_img *img, t_mlx *win);
 void	draw_square(t_img *img, int x, int y, int color);
 int		ft_get_max_line(int i, t_temp_map *map);
@@ -237,16 +257,23 @@ void	ft_texture_picker(t_mlx *win, float ray_point, char c);
 void	draw_3d_walls(t_mlx *win, float distance, int column, float hx);
 void	ft_draw_minimap(t_mlx *win);
 
-// --------------- 04_MOVES ------------------ //
-
+/* ---- 04_Moves ---- */
 int		ft_mod(int n);
 float	line_length(float x1, float y1, float x2, float y2);
-void	ft_init_vars(t_ray_vars	*vars, t_mlx *win);
+void	ft_init_vars(t_ray_vars *vars, t_mlx *win);
 int		key_press(int keycode, t_mlx *mlx);
 int		key_release(int keycode, t_mlx *mlx);
 void	process_movement(t_mlx *mlx);
 int		ft_circle_normalizer(float *ra);
 char	*ft_copy_line(char *map, int max_line);
 int		rgb_to_int(int red, int green, int blue);
+int		ft_mouse_move(int x, int y, t_mlx *mlx);
+
+/* ---- Door ---- */
+t_door	*get_door_at(t_mlx *win, int x, int y);
+void	update_all_doors(t_mlx *win, double delta_time);
+void	toggle_nearby_door(t_mlx *win);
+void	draw_door_wall(t_mlx *win, float distance, int column,
+			float wall_x, float hit_x, float hit_y);
 
 #endif
