@@ -6,7 +6,7 @@
 /*   By: thevaris <thevaris@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/01/04 20:17:16 by thevaris          #+#    #+#             */
-/*   Updated: 2026/02/20 17:46:23 by thevaris         ###   ########.fr       */
+/*   Updated: 2026/02/22 17:45:39 by thevaris         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,10 +27,10 @@
 # include "../libraries/libft/libft.h"
 
 # define PI 3.14159265359
-# define P2 1.57079632679 // PI/2
-# define P3 4.71238898038 //3*PI/2
+# define P2 1.57079632679
+# define P3 4.71238898038
 
-# define FOV 1.04719755 //(PI / 3)
+# define FOV 1.04719755
 
 # define WIDTH 1920
 # define HEIGHT 1080
@@ -41,7 +41,7 @@
 # define PLAYER_SIZE 20
 # define MM_P_MARGIN 4
 
-# define DR 0.000545415 //(FOV / WIDTH)
+# define DR 0.000545415
 
 typedef struct s_valid_map
 {
@@ -78,8 +78,6 @@ typedef enum e_exit
 	SUCCESS,
 }	t_exit;
 
-//--------- calculations intersection -------
-
 typedef struct s_ray
 {
 	float	rx;
@@ -102,9 +100,7 @@ typedef struct s_ray_vars
 	float	wall_x;
 	float	line;
 }	t_ray_vars;
-//--------- ------------ -------
 
-//--------- texture calculations -------
 typedef struct s_texture_vars
 {
 	int		y;
@@ -113,8 +109,6 @@ typedef struct s_texture_vars
 	float	ty_step;
 	float	ty_offset;
 }	t_texture_vars;
-
-//----------------------------
 
 typedef struct s_map
 {
@@ -236,6 +230,10 @@ void	ft_vision_angle(t_mlx *win, float px, float py);
 void	ft_texture_picker(t_mlx *win, float ray_point, char c);
 void	draw_3d_walls(t_mlx *win, float distance, int column, float hx);
 void	ft_draw_minimap(t_mlx *win);
+void	init_h(t_mlx *w, t_ray *r, float ra);
+void	init_v(t_mlx *w, t_ray *r, float ra);
+void	cast(t_mlx *w, t_ray *r);
+void	get_h_hit(t_mlx *w, float ra, float *x, float *y);
 
 // --------------- 04_MOVES ------------------ //
 
@@ -248,5 +246,7 @@ void	process_movement(t_mlx *mlx);
 int		ft_circle_normalizer(float *ra);
 char	*ft_copy_line(char *map, int max_line);
 int		rgb_to_int(int red, int green, int blue);
+int		check_collision(t_mlx *mlx, float x, float y);
+void	rotate_player_by(t_mlx *mlx, float delta);
 
 #endif

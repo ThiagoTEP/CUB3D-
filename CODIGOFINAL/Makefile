@@ -23,11 +23,11 @@ PARSE = $(addprefix 02_Parse/, $(PARSE_FILES))
 
 # --- 03 Grafic ---
 GRAFIC_FILES =	draw_shapes.c get_map.c render.c vision_line.c \
-				raycast.c wall_and_textures.c
+				raycast.c raycast_render.c wall_and_textures.c
 GRAFIC = $(addprefix 03_Grafic/, $(GRAFIC_FILES))
 
 # --- 04 Moves ---
-MOVES_FILES =	process_move.c utils.c move_render.c
+MOVES_FILES =	process_move.c move_player.c utils.c move_render.c
 MOVES = $(addprefix 04_Moves/, $(MOVES_FILES))
 
 # --- Todos os arquivos fonte ---
@@ -38,45 +38,36 @@ OBJ = $(patsubst $(SRC_DIR)%.c, $(OBJ_DIR)%.o, $(SRC))
 # ------- BONUS SOURCE FILES -------
 
 # 01_Process bonus
-# main_bonus.c         -> replaces main.c + clean_process.c(ft_remove_extra_spaces)
-# setters_bonus.c      -> replaces setters.c (adds init_doors)
-# clean_process_bonus.c-> replaces clean_process.c + free_process.c
 BONUS_PROCESS_FILES = main_bonus.c setters_bonus.c clean_process_bonus.c
 BONUS_PROCESS = $(addprefix 01_Process/, $(BONUS_PROCESS_FILES))
 
-# 01_Process shared: only msg_error.c and getters.c have no conflicts
+# 01_Process shared
 BONUS_SHARED_PROCESS_FILES = msg_error.c getters.c free_process.c
 BONUS_SHARED_PROCESS = $(addprefix 01_Process/, $(BONUS_SHARED_PROCESS_FILES))
 
 # 02_Parse bonus
-# parse_map_bonus.c -> replaces parse_checkers.c
-#                      defines first_check + check_line_player (accepts 'D')
 BONUS_PARSE_FILES = parse_map_bonus.c flood_map_bonus.c
 BONUS_PARSE = $(addprefix 02_Parse/, $(BONUS_PARSE_FILES))
 
-# 02_Parse shared: parse_checkers.c excluded (conflict with parse_map_bonus.c)
+# 02_Parse shared
 BONUS_SHARED_PARSE_FILES = parse_assets.c parse_validations.c \
                             parse_input.c parse_color.c parse_extensions.c
 BONUS_SHARED_PARSE = $(addprefix 02_Parse/, $(BONUS_SHARED_PARSE_FILES))
 
 # 03_Grafic bonus
-# minimap_bonus.c -> replaces minimap.c
-# raycast_bonus.c -> replaces raycast.c (with door support)
-# door_bonus.c    -> new (door logic)
 BONUS_GRAFIC_FILES = minimap_bonus.c raycast_bonus.c door_bonus.c
 BONUS_GRAFIC = $(addprefix 03_Grafic/, $(BONUS_GRAFIC_FILES))
 
-# 03_Grafic shared: raycast.c and minimap.c excluded (conflict)
+# 03_Grafic shared
 BONUS_SHARED_GRAFIC_FILES = draw_shapes.c get_map.c render.c vision_line.c \
                              wall_and_textures.c
 BONUS_SHARED_GRAFIC = $(addprefix 03_Grafic/, $(BONUS_SHARED_GRAFIC_FILES))
 
 # 04_Moves bonus
-# process_move_bonus.c -> replaces process_move.c (adds mouse + E key)
 BONUS_MOVES_FILES = process_move_bonus.c
 BONUS_MOVES = $(addprefix 04_Moves/, $(BONUS_MOVES_FILES))
 
-# 04_Moves shared: process_move.c excluded (conflict)
+# 04_Moves shared
 BONUS_SHARED_MOVES_FILES = utils.c move_render.c
 BONUS_SHARED_MOVES = $(addprefix 04_Moves/, $(BONUS_SHARED_MOVES_FILES))
 
