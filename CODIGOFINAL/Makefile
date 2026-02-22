@@ -206,8 +206,12 @@ clean:
 	@cd minilibx-linux && make clean > /dev/null 2>&1
 
 fclean: clean
-	@rm -rf $(NAME) $(NAME_BONUS) 2>/dev/null || true
-	@echo "$(RED)❌ Executable $(NAME) $(NAME_BONUS) removed$(RESET)"
+	@if [ -f $(NAME) ] || [ -f $(NAME_BONUS) ]; then \
+		rm -f $(NAME) $(NAME_BONUS); \
+		echo "$(RED)❌ Executable $(NAME) $(NAME_BONUS) removed$(RESET)"; \
+	else \
+		echo "$(YELLOW)⚠️  Nothing to remove$(RESET)"; \
+	fi
 	@cd libraries/libft && make fclean > /dev/null 2>&1
 
 re: fclean all
