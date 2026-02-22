@@ -38,7 +38,7 @@ OBJ = $(patsubst $(SRC_DIR)%.c, $(OBJ_DIR)%.o, $(SRC))
 # ------- BONUS SOURCE FILES -------
 
 # 01_Process bonus
-BONUS_PROCESS_FILES = main_bonus.c setters_bonus.c clean_process_bonus.c
+BONUS_PROCESS_FILES = main_bonus.c textures_bonus.c setters_bonus.c clean_process_bonus.c
 BONUS_PROCESS = $(addprefix 01_Process/, $(BONUS_PROCESS_FILES))
 
 # 01_Process shared
@@ -46,7 +46,7 @@ BONUS_SHARED_PROCESS_FILES = msg_error.c getters.c free_process.c
 BONUS_SHARED_PROCESS = $(addprefix 01_Process/, $(BONUS_SHARED_PROCESS_FILES))
 
 # 02_Parse bonus
-BONUS_PARSE_FILES = parse_map_bonus.c flood_map_bonus.c
+BONUS_PARSE_FILES = parse_map_bonus.c parse_map_utils_bonus.c flood_map_bonus.c
 BONUS_PARSE = $(addprefix 02_Parse/, $(BONUS_PARSE_FILES))
 
 # 02_Parse shared
@@ -55,7 +55,8 @@ BONUS_SHARED_PARSE_FILES = parse_assets.c parse_validations.c \
 BONUS_SHARED_PARSE = $(addprefix 02_Parse/, $(BONUS_SHARED_PARSE_FILES))
 
 # 03_Grafic bonus
-BONUS_GRAFIC_FILES = minimap_bonus.c raycast_bonus.c door_bonus.c
+BONUS_GRAFIC_FILES = minimap_bonus.c minimap_render_bonus.c raycast_bonus.c \
+					 raycast_render_bonus.c door_bonus.c door_render_bonus.c utils_bonus.c
 BONUS_GRAFIC = $(addprefix 03_Grafic/, $(BONUS_GRAFIC_FILES))
 
 # 03_Grafic shared
@@ -64,7 +65,7 @@ BONUS_SHARED_GRAFIC_FILES = draw_shapes.c get_map.c render.c vision_line.c \
 BONUS_SHARED_GRAFIC = $(addprefix 03_Grafic/, $(BONUS_SHARED_GRAFIC_FILES))
 
 # 04_Moves bonus
-BONUS_MOVES_FILES = process_move_bonus.c
+BONUS_MOVES_FILES = process_move_bonus.c move_player_bonus.c mouse_move_bonus.c
 BONUS_MOVES = $(addprefix 04_Moves/, $(BONUS_MOVES_FILES))
 
 # 04_Moves shared

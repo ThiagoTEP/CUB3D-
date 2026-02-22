@@ -6,7 +6,7 @@
 /*   By: thevaris <thevaris@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/20 16:33:12 by thevaris          #+#    #+#             */
-/*   Updated: 2026/02/20 17:41:54 by thevaris         ###   ########.fr       */
+/*   Updated: 2026/02/22 18:52:00 by thevaris         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,43 +45,16 @@ int	draw(t_mlx *win)
 	return (0);
 }
 
-static void	start_textures(t_mlx *win, t_tex *texture)
+static void	setup_hooks(t_mlx *win)
 {
-	if (texture->path == NULL)
-	{
-		print_error("Error\nError in texture path\n");
-		ft_cleanup_and_exit(win);
-	}
-	texture->mlx_img = mlx_xpm_file_to_image(win->mlx_connect,
-			texture->path, &texture->width, &texture->height);
-	if (texture->mlx_img == NULL)
-	{
-		print_error("Error\nError in texture path\n");
-		ft_cleanup_and_exit(win);
-	}
-	texture->addr = mlx_get_data_addr(texture->mlx_img,
-			&texture->bpp, &texture->line_len,
-			&texture->endian);
-}
-
-static void	start_door_texture(t_mlx *win)
-{
-	char	*path;
-
-	path = ft_strdup("./Textures/door_closed.xpm");
-	if (!path)
-		return ;
-	win->door_tex.mlx_img = mlx_xpm_file_to_image(win->mlx_connect,
-			path, &win->door_tex.width, &win->door_tex.height);
-	free(path);
-	if (!win->door_tex.mlx_img)
-	{
-		print_error("Warning: door_closed.xpm not found, using west texture\n");
-		return ;
-	}
-	win->door_tex.addr = mlx_get_data_addr(win->door_tex.mlx_img,
-			&win->door_tex.bpp, &win->door_tex.line_len,
-			&win->door_tex.endian);
+	mlx_hook(win->mlx_win, KeyPress, KeyPressMask, key_press, win);
+	mlx_hook(win->mlx_win, KeyRelease, KeyReleaseMask, key_release, win);
+	mlx_hook(win->mlx_win, MotionNotify, PointerMotionMask,
+		ft_mouse_move, win);
+	mlx_hook(win->mlx_win, 17, 0, ft_close, win);
+	mlx_loop_hook(win->mlx_connect, &draw, win);
+	mlx_mouse_hide(win->mlx_connect, win->mlx_win);
+	mlx_loop(win->mlx_connect);
 }
 
 void	render(t_mlx *win)
@@ -101,46 +74,8 @@ void	render(t_mlx *win)
 	win->img.mlx_img = mlx_new_image(win->mlx_connect, WIDTH, HEIGHT);
 	win->img.addr = mlx_get_data_addr(win->img.mlx_img, &win->img.bpp,
 			&win->img.line_len, &win->img.endian);
-	start_textures(win, &win->north_texture);
-	start_textures(win, &win->south_texture);
-	start_textures(win, &win->east_texture);
-	start_textures(win, &win->west_texture);
-	start_door_texture(win);
-	mlx_hook(win->mlx_win, KeyPress, KeyPressMask, key_press, win);
-	mlx_hook(win->mlx_win, KeyRelease, KeyReleaseMask, key_release, win);
-	mlx_hook(win->mlx_win, MotionNotify, PointerMotionMask, ft_mouse_move, win);
-	mlx_hook(win->mlx_win, 17, 0, ft_close, win);
-	mlx_loop_hook(win->mlx_connect, &draw, win);
-	mlx_mouse_hide(win->mlx_connect, win->mlx_win);
-	mlx_loop(win->mlx_connect);
-}
-
-char	*ft_remove_extra_spaces(char *str, t_temp_map *map)
-{
-	char	*line;
-	int		i;
-	int		j;
-
-	i = 0;
-	j = 0;
-	line = ft_calloc(sizeof(char), ft_strlen(str) + 1);
-	if (!line)
-		error_message(-15, map);
-	while (is_whitespace(str[i]))
-		i++;
-	while (str[i])
-	{
-		while (str[i] && !is_whitespace(str[i]))
-			line[j++] = str[i++];
-		while (is_whitespace(str[i]))
-			i++;
-		if (i > 0 && str[i] != '\0')
-			line[j++] = ' ';
-	}
-	line[j] = '\0';
-	if (line[0] == 'C' || line[0] == 'F')
-		line = ft_color_special(line, 0, 0, map);
-	return (line);
+	start_all_textures(win);
+	setup_hooks(win);
 }
 
 int	main(int argc, char *argv[])

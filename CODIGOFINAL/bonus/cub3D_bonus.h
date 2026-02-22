@@ -6,7 +6,7 @@
 /*   By: thevaris <thevaris@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/20 16:36:17 by thevaris          #+#    #+#             */
-/*   Updated: 2026/02/20 17:38:19 by thevaris         ###   ########.fr       */
+/*   Updated: 2026/02/22 20:14:39 by thevaris         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -134,6 +134,13 @@ typedef struct s_texture_vars
 	float	ty_offset;
 }	t_texture_vars;
 
+typedef struct s_door_draw
+{
+	float	wall_x;
+	float	hit_x;
+	float	hit_y;
+}		t_door_draw;
+
 typedef struct s_map
 {
 	int		width;
@@ -205,7 +212,6 @@ typedef struct s_mlx
 	t_keys		keys;
 }	t_mlx;
 
-/* ---- 01_Process ---- */
 void	ft_cleanup_and_exit(t_mlx *mlx);
 int		ft_close(t_mlx *mlx);
 void	free_map_parse(t_temp_map **map);
@@ -220,6 +226,9 @@ void	print_error(const char *msg);
 float	ft_set_player(t_mlx *win, char **map);
 void	set_up_win(t_mlx *win, t_temp_map *map);
 char	*ft_remove_extra_spaces(char *str, t_temp_map *map);
+void	start_all_textures(t_mlx *win);
+int		draw(t_mlx *win);
+void	render(t_mlx *win);
 
 /* ---- 02_Parse ---- */
 void	flood(t_temp_map *map, int y, int x, int map_size);
@@ -238,6 +247,8 @@ void	check_map(t_temp_map *map, int start, int end, int i);
 char	*ft_color_special(char *line, int j, int i, t_temp_map *map);
 void	ft_validations(char *argv[]);
 int		is_whitespace(char c);
+int		player_check(char c, int flag);
+int		ft_check_line(int pos, t_temp_map *map);
 
 /* ---- 03_Grafic ---- */
 void	ft_update_player(int px, int py, t_img *img, t_mlx *win);
@@ -256,6 +267,11 @@ void	ft_vision_angle(t_mlx *win, float px, float py);
 void	ft_texture_picker(t_mlx *win, float ray_point, char c);
 void	draw_3d_walls(t_mlx *win, float distance, int column, float hx);
 void	ft_draw_minimap(t_mlx *win);
+void	draw_mm_tile(t_img *img, int sx, int sy, int color);
+void	draw_mm_dir_ray(t_mlx *win, float ra);
+void	draw_mm_player(t_mlx *win);
+void	draw_mm_dir(t_mlx *win);
+void	draw_mm_tiles(t_mlx *win);
 
 /* ---- 04_Moves ---- */
 int		ft_mod(int n);
@@ -268,12 +284,25 @@ int		ft_circle_normalizer(float *ra);
 char	*ft_copy_line(char *map, int max_line);
 int		rgb_to_int(int red, int green, int blue);
 int		ft_mouse_move(int x, int y, t_mlx *mlx);
+int		tile_is_solid(t_mlx *mlx, int mx, int my);
+int		check_collision(t_mlx *mlx, float x, float y);
+void	rotate_player_by(t_mlx *mlx, float delta);
+void	do_movements(t_mlx *mlx, float *nx, float *ny);
+
+/* ---- Raycast helpers ---- */
+int		is_wall(t_mlx *w, int x, int y);
+int		is_door_vis(t_mlx *w, int x, int y);
+void	cast_ray(t_mlx *w, t_ray *r);
+void	get_h_hit(t_mlx *w, float ra, float *x, float *y);
+void	get_v_hit(t_mlx *w, float ra, float *x, float *y);
+void	init_h(t_mlx *w, t_ray *r, float ra);
+void	init_v(t_mlx *w, t_ray *r, float ra);
 
 /* ---- Door ---- */
 t_door	*get_door_at(t_mlx *win, int x, int y);
 void	update_all_doors(t_mlx *win, double delta_time);
 void	toggle_nearby_door(t_mlx *win);
 void	draw_door_wall(t_mlx *win, float distance, int column,
-			float wall_x, float hit_x, float hit_y);
+			t_door_draw *d);
 
 #endif

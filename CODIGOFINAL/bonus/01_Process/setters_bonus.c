@@ -6,18 +6,17 @@
 /*   By: thevaris <thevaris@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/02/20 16:34:04 by thevaris          #+#    #+#             */
-/*   Updated: 2026/02/20 16:34:05 by thevaris         ###   ########.fr       */
+/*   Updated: 2026/02/22 18:52:00 by thevaris         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../cub3D_bonus.h"
 
-static void	init_doors(t_mlx *win)
+static int	count_doors(t_mlx *win)
 {
-	int		i;
-	int		j;
-	int		count;
-	t_door	*doors;
+	int	i;
+	int	j;
+	int	count;
 
 	count = 0;
 	i = 0;
@@ -32,15 +31,15 @@ static void	init_doors(t_mlx *win)
 		}
 		i++;
 	}
-	win->map->door_count = count;
-	if (count == 0)
-	{
-		win->map->doors = NULL;
-		return ;
-	}
-	doors = ft_calloc(sizeof(t_door), count);
-	if (!doors)
-		return ;
+	return (count);
+}
+
+static void	fill_doors(t_mlx *win, t_door *doors)
+{
+	int	i;
+	int	j;
+	int	count;
+
 	count = 0;
 	i = 0;
 	while (i < win->map->height)
@@ -61,6 +60,24 @@ static void	init_doors(t_mlx *win)
 		}
 		i++;
 	}
+}
+
+static void	init_doors(t_mlx *win)
+{
+	int		count;
+	t_door	*doors;
+
+	count = count_doors(win);
+	win->map->door_count = count;
+	if (count == 0)
+	{
+		win->map->doors = NULL;
+		return ;
+	}
+	doors = ft_calloc(sizeof(t_door), count);
+	if (!doors)
+		return ;
+	fill_doors(win, doors);
 	win->map->doors = doors;
 }
 
